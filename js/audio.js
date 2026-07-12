@@ -41,15 +41,15 @@ export function createAudio({ storage, AC = globalThis.AudioContext } = {}) {
     o.start(t); o.stop(t + 0.12);
   }
 
-  function chime() { // 磬：基音＋泛音長衰減
+  function chime() { // 磬：親子版改為明亮風鈴——C6/E6/G6 快速琶音，衰減縮短去除空靈陰森感
     const c = ensureCtx(); if (!c) return;
     const t = c.currentTime;
-    for (const [freq, peak] of [[1318.5, 0.1], [2637, 0.04]]) {
+    for (const [freq, peak, delay] of [[1046.5, 0.09, 0], [1318.5, 0.07, 0.06], [1568, 0.05, 0.12]]) {
       const o = c.createOscillator(); const g = c.createGain();
       o.type = 'sine'; o.frequency.value = freq;
-      env(g, t, peak, 1.4);
+      env(g, t + delay, peak, 0.9);
       o.connect(g).connect(c.destination);
-      o.start(t); o.stop(t + 1.5);
+      o.start(t + delay); o.stop(t + delay + 1);
     }
   }
 

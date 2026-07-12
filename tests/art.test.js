@@ -3,7 +3,7 @@ import { existsSync, statSync, readdirSync } from 'node:fs';
 
 export const ART_MANIFEST = [
   'jigong-main', 'jigong-warm', 'jigong-stern',
-  'prologue-scene', 'interlude-scene',
+  'prologue-heaven', 'interlude-descend',
   'hall1-scene', 'hall2-scene', 'hall3-scene', 'hall4-scene', 'hall5-scene',
   'hall6-scene', 'hall7-scene', 'hall8-scene', 'hall9-scene', 'hall10-scene',
   'soul-hall1', 'soul-hall3', 'soul-hall5', 'soul-hall7',
@@ -12,7 +12,7 @@ export const ART_MANIFEST = [
   'mirror-hall5-1', 'mirror-hall5-2', 'mirror-hall5-3',
   'mirror-hall7-1', 'mirror-hall7-2', 'mirror-hall7-3',
   'watch-hall2', 'watch-hall4', 'watch-hall6', 'watch-hall8', 'watch-hall9',
-  'ending-highGood', 'ending-highBad', 'ending-lowGood', 'ending-lowBad',
+  'tree-highGood', 'tree-highBad', 'tree-lowGood', 'tree-lowBad',
   'share-bg',
 ].map((n) => `${n}.webp`);
 

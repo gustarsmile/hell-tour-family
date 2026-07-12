@@ -1,0 +1,28 @@
+嵌入碼：遊戲是純靜態網頁，GitHub Pages 沒有擋 iframe，直接用 iframe 嵌入即可。最簡單的一段：
+
+
+<iframe
+  src="https://gustarsmile.github.io/hell-tour-game/"
+  title="幽冥之旅：地獄遊記"
+  style="width: 100%; max-width: 480px; height: 780px; border: 0; border-radius: 8px; display: block; margin: 0 auto;"
+  allow="web-share"
+  loading="lazy">
+</iframe>
+幾個要點：
+
+allow="web-share" 不能省 — 沒有它，嵌在別人網站裡時「分享結果」按鈕（系統分享面板）會被瀏覽器擋掉。
+尺寸建議：遊戲介面以直式 480px 寬為主，height 給 700–850px 玩起來最舒服；若嵌入處版面較寬（≥900px），可以把 max-width 放大到 960px，就會自動變成左圖右文的桌機版面。
+想要滿版占滿手機螢幕的話，用這個 RWD 包法：
+
+<div style="position: relative; width: 100%; height: 90vh; max-height: 900px;">
+  <iframe src="https://gustarsmile.github.io/hell-tour-game/"
+    title="幽冥之旅：地獄遊記"
+    style="position: absolute; inset: 0; width: 100%; height: 100%; border: 0;"
+    allow="web-share"></iframe>
+</div>
+一個小提醒：iframe 裡的存檔（localStorage）在部分瀏覽器（尤其 iPhone 的 Safari）會被當成第三方儲存空間隔離——遊戲照玩、進度也存得住，但和玩家直接開網址玩的進度是分開的兩份。所以若是放在廟方或部落格頁面，建議在 iframe 旁再放一顆「全螢幕開啟」的連結按鈕，長時間遊玩體驗最好：
+
+
+<p style="text-align: center;">
+  <a href="https://gustarsmile.github.io/hell-tour-game/" target="_blank" rel="noopener">⛩ 全螢幕開啟遊戲</a>
+</p>

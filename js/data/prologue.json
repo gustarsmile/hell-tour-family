@@ -1,0 +1,334 @@
+{
+  "id": "prologue",
+  "art": "prologue-heaven.webp",
+  "karmaWeight": 2,
+  "start": "intro1",
+  "nodes": [
+    {
+      "id": "intro1",
+      "type": "line",
+      "speaker": "旁白",
+      "text": "睡前，窗外忽然亮了一下。一朵蓮花——比你的床還大的蓮花——浮在窗外，花瓣上站著一個搖蒲扇的和尚。",
+      "next": "intro2"
+    },
+    {
+      "id": "intro2",
+      "type": "line",
+      "speaker": "濟公",
+      "img": "jigong-main.webp",
+      "text": "「莫慌、莫慌！貧僧濟公是也。今夜奉旨，接你上天堂開開眼界。哈哈哈！」",
+      "next": "intro3"
+    },
+    {
+      "id": "intro3",
+      "type": "line",
+      "speaker": "濟公",
+      "text": "「來，先喝一口『天水』——洗去一身塵氣，身子輕了，才上得了天。」",
+      "next": "intro4"
+    },
+    {
+      "id": "intro4",
+      "type": "line",
+      "speaker": "旁白",
+      "text": "水一入口，涼涼甜甜。你的身子忽然輕得像一朵雲，腳尖一點，就飄了起來。",
+      "next": "ascend1"
+    },
+    {
+      "id": "ascend1",
+      "type": "line",
+      "speaker": "濟公",
+      "text": "「上蓮台，坐穩嘍！天上不比別處，一路的風光，儘管睜大眼睛看。」",
+      "next": "ascend2"
+    },
+    {
+      "id": "ascend2",
+      "type": "line",
+      "speaker": "旁白",
+      "text": "蓮台緩緩升起。雲下是萬家燈火；雲上金光藹藹，過路的神仙都朝你合掌微笑。",
+      "next": "gate1"
+    },
+    {
+      "id": "gate1",
+      "type": "line",
+      "speaker": "旁白",
+      "text": "前方一座大門聳入雲霄，門前一個毛茸茸的身影，一根金棒舞得虎虎生風——那身手，像極了故事裡的孫悟空。",
+      "next": "gate2"
+    },
+    {
+      "id": "gate2",
+      "type": "line",
+      "speaker": "齊天大聖",
+      "text": "「哈哈，小娃兒好眼力，俺老孫在此鎮守南天門！怎麼，看俺像什麼？『見怪』嗎？」",
+      "next": "gate3"
+    },
+    {
+      "id": "gate3",
+      "type": "line",
+      "speaker": "旁白",
+      "text": "你連忙搖頭：「見聖！見聖！」大聖樂得一個筋斗翻上雲頭。",
+      "next": "gate4"
+    },
+    {
+      "id": "gate4",
+      "type": "line",
+      "speaker": "齊天大聖",
+      "text": "「乖！心裡乾乾淨淨的人，南天門的火就燒不著他。你喝過天水，又有濟顛和尚領著——過吧！」",
+      "next": "yao1"
+    },
+    {
+      "id": "yao1",
+      "type": "line",
+      "speaker": "旁白",
+      "text": "過了南天門，眼前豁然開朗——瑤池到了。白玉亭台浮在雲海上，仙鶴掠過，亭裡幾位神仙正圍坐喝茶。",
+      "next": "yao2"
+    },
+    {
+      "id": "yao2",
+      "type": "line",
+      "speaker": "旁白",
+      "text": "白鬍子的南極仙翁坐在主位，笑瞇瞇地朝你招手；一旁的太白金星放下茶盞，捋著鬍子直點頭。",
+      "next": "yao3"
+    },
+    {
+      "id": "yao3",
+      "type": "line",
+      "speaker": "太白金星",
+      "text": "「說起來，人在世上做的每一件事，天上看得見，地府也記著帳呢。」",
+      "next": "yao4"
+    },
+    {
+      "id": "yao4",
+      "type": "line",
+      "speaker": "南極仙翁",
+      "text": "「小娃兒，別光站著聽。亭裡這面『雲鏡』，正映著人間幾個孩子，遇上了為難的事。你替他們想想——換作是你，會怎麼做？」",
+      "next": "q1"
+    },
+    {
+      "id": "q1",
+      "type": "choice",
+      "label": "雲鏡一問・多找的錢",
+      "speaker": "旁白",
+      "text": "雲鏡亮起：雜貨店裡，一個孩子買完東西，阿姨忙中有錯，多找了五十元。他走出店門口才發現……",
+      "choices": [
+        {
+          "text": "轉身走回去，把錢還給阿姨",
+          "karma": {
+            "axis": "honesty",
+            "delta": 1
+          },
+          "next": "t2"
+        },
+        {
+          "text": "金額不大，下次經過再還吧",
+          "karma": {
+            "axis": "honesty",
+            "delta": 0
+          },
+          "next": "t2"
+        },
+        {
+          "text": "收進口袋——是阿姨自己找錯的",
+          "karma": {
+            "axis": "honesty",
+            "delta": -1
+          },
+          "next": "t2"
+        }
+      ]
+    },
+    {
+      "id": "t2",
+      "type": "line",
+      "speaker": "旁白",
+      "text": "你話音剛落，雲鏡輕輕一轉，畫面換了——",
+      "next": "q2"
+    },
+    {
+      "id": "q2",
+      "type": "choice",
+      "label": "雲鏡二問・群組的謠言",
+      "speaker": "旁白",
+      "text": "班上的群組瘋傳「小翔偷了班費」，沒有人知道是真是假。訊息一則接著一則跳出來……",
+      "choices": [
+        {
+          "text": "出聲提醒大家：還沒查清楚，先別亂傳",
+          "karma": {
+            "axis": "speech",
+            "delta": 1
+          },
+          "next": "t3"
+        },
+        {
+          "text": "已讀不回，靜靜看著",
+          "karma": {
+            "axis": "speech",
+            "delta": 0
+          },
+          "next": "t3"
+        },
+        {
+          "text": "順手轉傳，再補一句「我早就覺得他怪怪的」",
+          "karma": {
+            "axis": "speech",
+            "delta": -1
+          },
+          "next": "t3"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "type": "line",
+      "speaker": "旁白",
+      "text": "神仙們不說好，也不說壞，只是端著茶，靜靜聽。雲鏡又是一轉——",
+      "next": "q3"
+    },
+    {
+      "id": "q3",
+      "type": "choice",
+      "label": "雲鏡三問・奶奶的呼喚",
+      "speaker": "旁白",
+      "text": "一個孩子正打電動，打到最要緊的一關。廚房裡，奶奶喊他幫忙拿一下東西……",
+      "choices": [
+        {
+          "text": "按下暫停，先去幫奶奶",
+          "karma": {
+            "axis": "filial",
+            "delta": 1
+          },
+          "next": "t4"
+        },
+        {
+          "text": "喊「等一下啦」，拖到打完這關再說",
+          "karma": {
+            "axis": "filial",
+            "delta": 0
+          },
+          "next": "t4"
+        },
+        {
+          "text": "裝作沒聽見，繼續打",
+          "karma": {
+            "axis": "filial",
+            "delta": -1
+          },
+          "next": "t4"
+        }
+      ]
+    },
+    {
+      "id": "t4",
+      "type": "line",
+      "speaker": "旁白",
+      "text": "南極仙翁的鬍子動了動，像是笑了。雲鏡最後一轉——",
+      "next": "q4"
+    },
+    {
+      "id": "q4",
+      "type": "choice",
+      "label": "雲鏡四問・受傷的小貓",
+      "speaker": "旁白",
+      "text": "放學路上，一隻小貓縮在牆角，一隻腳受了傷，喵喵地叫。四下沒有別人……",
+      "choices": [
+        {
+          "text": "蹲下來看看牠，再去找大人幫忙",
+          "karma": {
+            "axis": "mercy",
+            "delta": 1
+          },
+          "next": "tree1"
+        },
+        {
+          "text": "站得遠遠的，看有沒有別人來管",
+          "karma": {
+            "axis": "mercy",
+            "delta": 0
+          },
+          "next": "tree1"
+        },
+        {
+          "text": "繞路走開，當作沒看見",
+          "karma": {
+            "axis": "mercy",
+            "delta": -1
+          },
+          "next": "tree1"
+        }
+      ]
+    },
+    {
+      "id": "tree1",
+      "type": "line",
+      "speaker": "旁白",
+      "text": "四問答完，雲鏡的光緩緩暗下。神仙們互相看了一眼，笑而不語。",
+      "next": "tree2"
+    },
+    {
+      "id": "tree2",
+      "type": "line",
+      "speaker": "濟公",
+      "text": "「答得如何，天知地知，急什麼。——來，趁茶還熱，貧僧帶你去看樣好東西。」",
+      "next": "tree3"
+    },
+    {
+      "id": "tree3",
+      "type": "line",
+      "speaker": "旁白",
+      "text": "濟公領你到瑤池後的花園。好大的一座園子！種滿了各式各樣的樹：有的開滿花、結滿果；有的葉子斑斑、枝幹歪歪。",
+      "next": "tree4"
+    },
+    {
+      "id": "tree4",
+      "type": "line",
+      "speaker": "濟公",
+      "text": "「世上每一個人，天上都有一棵他的『原靈花樹』。人在下面做一件好事，樹就開一朵花；做一件虧心事，葉子就黃一片——半點做不了假。」",
+      "next": "tree5"
+    },
+    {
+      "id": "tree5",
+      "type": "line",
+      "speaker": "旁白",
+      "text": "走到園子深處，一棵小樹上掛著塊小木牌——上頭寫的，竟是你的名字。",
+      "next": "tree6"
+    },
+    {
+      "id": "tree6",
+      "type": "line",
+      "speaker": "濟公",
+      "text": "「記住它現在的樣子。等你回來，再來看看它。」",
+      "next": "send1"
+    },
+    {
+      "id": "send1",
+      "type": "line",
+      "speaker": "南極仙翁",
+      "text": "「小娃兒，光看天堂，不知人為何要行善。——濟公，帶這孩子下地府，見習一趟吧。」",
+      "next": "send2"
+    },
+    {
+      "id": "send2",
+      "type": "line",
+      "speaker": "濟公",
+      "text": "「領旨！你且做貧僧的『見習記錄生』——把地府的見聞一一記下，回來講給眾仙聽，這就是你的功課。」",
+      "next": "outro"
+    },
+    {
+      "id": "outro",
+      "type": "line",
+      "speaker": "旁白",
+      "text": "辭別眾仙，蓮台調頭，朝雲海深處緩緩落下。你還不知道——今晚，將是你這輩子最難忘的一夜。",
+      "next": "fin"
+    },
+    {
+      "id": "fin",
+      "type": "end"
+    }
+  ],
+  "menuTitle": "序章・雲上茶會",
+  "tagline": "乘蓮台過南天門，雲鏡四問記心性",
+  "source": {
+    "book": "天堂遊記",
+    "chapters": "一、十四、十八",
+    "url": "https://taolibrary.com/category/category48/c48001b.htm"
+  }
+}

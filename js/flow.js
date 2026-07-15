@@ -250,6 +250,21 @@ export async function startGame({ root, loadJSON = fetchJSON, storage, audio = N
     return scr.id === PROLOGUE_ID ? '序章・雲上茶會' : '過場';
   }
 
+  const HEAVEN_SCREENS = new Set(['prologue']); // 天堂場景清單；封面另於 showCover 處理
+  function setTheme(heaven) {
+    if (document.body.classList.contains('theme-heaven') === heaven) return;
+    const fog = document.createElement('div');
+    fog.className = 'fog';
+    document.body.appendChild(fog);
+    requestAnimationFrame(() => {
+      document.body.classList.toggle('theme-heaven', heaven);
+      fog.classList.add('fade');
+      fog.addEventListener('transitionend', () => fog.remove(), { once: true });
+      setTimeout(() => fog.remove(), 2000); // happy-dom 無 transition 事件的保險
+    });
+    audio.setScene?.(heaven ? 'heaven' : 'hell'); // Task 2 實作；實作前為 no-op
+  }
+
   function menuConfig() {
     return {
       modeLabel: MODES[state.mode]?.label ?? '',
@@ -272,6 +287,7 @@ export async function startGame({ root, loadJSON = fetchJSON, storage, audio = N
     const scr = modeList.find((s) => s.id === id) ?? flow.screens.find((s) => s.id === id);
     if (!scr) { showCover(); return; }
     currentScreenId = id;
+    setTheme(HEAVEN_SCREENS.has(id));
     resetScreen(state, id); // 重入整殿重新計分，杜絕重複灌分
     state.progress.screen = id;
     save(state, storage);
@@ -309,6 +325,7 @@ export async function startGame({ root, loadJSON = fetchJSON, storage, audio = N
 
   function showCover() {
     currentScreenId = null;
+    setTheme(true);
     localBack = null;
     screenHistory.length = 0;
     nav.setBack(null);

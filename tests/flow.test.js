@@ -28,6 +28,12 @@ function fakeStorage() {
   };
 }
 
+// setTheme() 在 requestAnimationFrame 內才切換 class（見 flow.js），happy-dom 不會同步跑 rAF，
+// 測試需明確等一格才能斷言。
+function nextFrame() {
+  return new Promise((resolve) => requestAnimationFrame(resolve));
+}
+
 function resourceOf(screenId) {
   const scr = flowData.screens.find((s) => s.id === screenId);
   return scr?.src ? FILES[`js/data/${scr.src}`] : null;
@@ -87,6 +93,22 @@ function autoplay(root, storage, { acceptBranch = true, evil = false } = {}) {
 }
 
 describe('全流程整合（flow manifest）', () => {
+  it('主題切換：封面與序章為天堂白，入殿轉暗', async () => {
+    // document 在此檔案的多個 it 間共用，先清掉殘留 class／霧層，避免受其他測試執行順序影響
+    document.body.classList.remove('theme-heaven');
+    document.body.querySelectorAll('.fog').forEach((f) => f.remove());
+    const storage = fakeStorage();
+    const root = document.createElement('div');
+    await startGame({ root, loadJSON, storage });
+    await nextFrame();
+    // 封面＝天堂
+    expect(document.body.classList.contains('theme-heaven')).toBe(true);
+    [...root.querySelectorAll('button')].find((b) => b.textContent.includes('完整遊歷')).click();
+    await nextFrame();
+    // 序章＝天堂
+    expect(document.body.classList.contains('theme-heaven')).toBe(true);
+  });
+
   it('入口封面：無存檔顯示完整／精簡兩版，不顯示續玩', async () => {
     const storage = fakeStorage();
     const root = document.createElement('div');

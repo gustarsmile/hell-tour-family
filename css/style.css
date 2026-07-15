@@ -13,6 +13,43 @@
   --paper-dim: #cbbc9c;
 }
 
+/* 天堂主題：雲白、鎏金、淡石青、粉霞（body.theme-heaven 由 flow.js 切換） */
+body.theme-heaven {
+  color-scheme: light;
+  --ink: #f7f2e7;
+  --ink-2: #fffdf6;
+  --vermilion: #b0582a;
+  --vermilion-dim: #d8a06a;
+  --gold: #a9832a;
+  --gold-dim: #cdb56e;
+  --azure: #6f9fae;
+  --paper: #4a3b28;
+  --paper-dim: #8a795e;
+  background: radial-gradient(ellipse at 50% -10%, #fffef9 0%, #f3ead4 60%, #e9dcba 100%);
+}
+body.theme-heaven .scene-box {
+  background: linear-gradient(180deg, var(--ink-2), #f6eed9);
+}
+/* 遊歷選單面板：原為墨黑漸層，天堂場景（如序章）開啟時一併轉淺色，避免深色板突兀蓋在白底上 */
+body.theme-heaven #nav-menu {
+  background: linear-gradient(180deg, var(--ink-2), #f6eed9);
+}
+/* 按鈕底色（.btn-next）原本寫死暗朱紅，天堂場景改用淺色系朱紅，並加深邊框確保淺底可視 */
+body.theme-heaven .btn-next {
+  background: linear-gradient(180deg, rgba(176, 88, 42, 0.18), rgba(176, 88, 42, 0.06));
+}
+body.theme-heaven .btn {
+  border-color: var(--gold);
+}
+/* 白霧轉場 */
+.fog {
+  position: fixed; inset: 0; z-index: 999;
+  background: #fdfaf2; opacity: 1; pointer-events: none;
+  transition: opacity 1.2s ease;
+}
+.fog.fade { opacity: 0; }
+body { transition: background 0.6s ease, color 0.6s ease; }
+
 * { box-sizing: border-box; }
 
 body {

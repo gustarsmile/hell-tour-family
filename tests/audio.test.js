@@ -49,4 +49,9 @@ describe('audio 模組', () => {
     a.stopAmbient();
     expect(() => a.stopAmbient()).not.toThrow();
   });
+  it('setScene 切換場景不擲錯，且重建環境音', () => {
+    const a = createAudio({ storage: memStorage(), AC: FakeAC });
+    a.startAmbient();
+    expect(() => { a.setScene('hell'); a.setScene('heaven'); a.setScene('heaven'); }).not.toThrow();
+  });
 });

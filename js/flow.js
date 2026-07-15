@@ -250,7 +250,7 @@ export async function startGame({ root, loadJSON = fetchJSON, storage, audio = N
     return scr.id === PROLOGUE_ID ? '序章・雲上茶會' : '過場';
   }
 
-  const HEAVEN_SCREENS = new Set(['prologue']); // 天堂場景清單；封面另於 showCover 處理
+  const HEAVEN_SCREENS = new Set([PROLOGUE_ID]); // 天堂場景清單；封面另於 showCover 處理
   function setTheme(heaven) {
     if (document.body.classList.contains('theme-heaven') === heaven) return;
     const fog = document.createElement('div');

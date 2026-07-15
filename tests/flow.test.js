@@ -107,6 +107,14 @@ describe('全流程整合（flow manifest）', () => {
     await nextFrame();
     // 序章＝天堂
     expect(document.body.classList.contains('theme-heaven')).toBe(true);
+    // 仿 autoplay 逐鈕點擊推進（序章→過場→一殿），進殿時 runScreen 會先存進度
+    for (let i = 0; i < 200 && load(storage).progress.screen !== 'hall1'; i++) {
+      (root.querySelector('.btn-next') ?? root.querySelector('.btn-choice')).click();
+    }
+    expect(load(storage).progress.screen).toBe('hall1');
+    await nextFrame();
+    // 入殿＝地府暗色
+    expect(document.body.classList.contains('theme-heaven')).toBe(false);
   });
 
   it('入口封面：無存檔顯示完整／精簡兩版，不顯示續玩', async () => {

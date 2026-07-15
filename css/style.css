@@ -41,6 +41,12 @@ body.theme-heaven .btn-next {
 body.theme-heaven .btn {
   border-color: var(--gold);
 }
+/* 天堂主題：浮動控制元件改淡色背景、取消亮度濾鏡 */
+body.theme-heaven .nav-btn,
+body.theme-heaven #audio-toggle { background: rgba(255, 253, 246, 0.85); }
+body.theme-heaven #nav-toast { background: rgba(255, 253, 246, 0.95); color: var(--paper); }
+body.theme-heaven .cover-subtitle,
+body.theme-heaven .menu-section { filter: none; }
 /* 白霧轉場 */
 .fog {
   position: fixed; inset: 0; z-index: 999;

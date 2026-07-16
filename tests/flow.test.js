@@ -302,3 +302,35 @@ describe('枉死城支線功德', () => {
     expect(root.textContent).toContain('悟性值 0');
   });
 });
+
+describe('回天看樹（終幕結算）', () => {
+  const miniFlow = {
+    screens: [
+      { id: 'hall6', type: 'visit', src: 'hall6.json' },
+      { id: 'hall10', type: 'finale', src: 'hall10.json' },
+    ],
+  };
+  const miniLoad = async (p) =>
+    p === 'js/data/flow.json' ? structuredClone(miniFlow) : loadJSON(p);
+
+  it('done 相位切天堂主題、左上換玩家花樹圖；返回 mission 復為地府', async () => {
+    document.body.classList.remove('theme-heaven');
+    document.body.querySelectorAll('.fog').forEach((f) => f.remove());
+    const storage = fakeStorage();
+    const root = document.createElement('div');
+    let backFn = null;
+    const nav = { setBack: (f) => { backFn = f; }, setMenu() {}, closeMenu() {}, toast() {} };
+    await startGame({ root, loadJSON: miniLoad, storage, nav });
+    autoplay(root, storage, { acceptBranch: true }); // 全對全善 → highGood
+    await nextFrame();
+    expect(document.body.classList.contains('theme-heaven')).toBe(true);
+    expect(root.querySelector('.scene-art img').getAttribute('src'))
+      .toBe('assets/art/tree-highGood.webp');
+    // 從結算返回上一步（mission）：主題復暗、左上復為轉輪殿景
+    backFn();
+    await nextFrame();
+    expect(document.body.classList.contains('theme-heaven')).toBe(false);
+    expect(root.querySelector('.scene-art img').getAttribute('src'))
+      .toBe('assets/art/hall10-scene.webp');
+  });
+});

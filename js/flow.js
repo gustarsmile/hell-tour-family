@@ -219,6 +219,7 @@ export async function startGame({ root, loadJSON = fetchJSON, storage, audio = N
   function runFinale(data) {
     const finale = createFinale(data, state);
     const step = () => {
+      setTheme(finale.phase === 'done'); // 回天看樹：結算切回天堂白，自結算返回則復暗
       setLocalBack(finale.phase !== finale.phases[0]
         ? () => { prevFinalePhase(finale); step(); }
         : null);

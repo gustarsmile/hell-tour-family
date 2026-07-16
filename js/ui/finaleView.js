@@ -21,7 +21,11 @@ export function renderFinalePhase(finale, handlers, root) {
   root.innerHTML = '';
   const d = finale.data;
   const s = finale.state;
-  const frame = sceneFrame('scene-box finale-box', d.art?.scene);
+  // 回天看樹：結算畫面左上改顯玩家的原靈花樹（四版依悟性×心性），其餘相位維持殿景
+  const sceneArt = finale.phase === 'done'
+    ? d.art?.endings?.[endingKey(s)] ?? d.art?.scene
+    : d.art?.scene;
+  const frame = sceneFrame('scene-box finale-box', sceneArt);
   const box = frame.body; // 內容進右欄（窄幕時在主圖下方）
   box.appendChild(el('div', 'hall-title', `${hallLabel(d.hall)}・${d.king}`));
 

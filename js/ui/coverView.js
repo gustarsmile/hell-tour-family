@@ -13,8 +13,8 @@ export function renderCover({ resumable, modes }, handlers, root) {
   box.appendChild(art);
 
   const body = el('div', 'cover-body');
-  body.appendChild(el('div', 'cover-title', '雲上之旅'));
-  body.appendChild(el('div', 'cover-subtitle', '天 堂 遊 記'));
+  body.appendChild(el('div', 'cover-title', '地獄遊記'));
+  body.appendChild(el('div', 'cover-subtitle', '親 子 共 讀 版'));
   body.appendChild(el('p', 'cover-tagline', '乘蓮台・遊天堂・訪地府——回來，看看你的花樹。'));
 
   if (resumable) {

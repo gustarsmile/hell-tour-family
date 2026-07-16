@@ -127,7 +127,7 @@ export function renderShareOverlay(canvas, payload, onBack, root) {
     if (typeof canvas.toBlob === 'function') canvas.toBlob((blob) => {
       if (blob) {
         // 手機系統分享面板：可直接傳圖到 LINE／IG 等
-        const file = new File([blob], '雲上之旅-稱號卡.png', { type: 'image/png' });
+        const file = new File([blob], '地獄遊記親子版-稱號卡.png', { type: 'image/png' });
         if (navigator.canShare?.({ files: [file] })) {
           const shareBtn = el('button', 'btn btn-next', '分享結果');
           shareBtn.addEventListener('click', () => {
@@ -139,7 +139,7 @@ export function renderShareOverlay(canvas, payload, onBack, root) {
         // blob 連結比 dataURL 可靠（大圖 dataURL 在部分手機瀏覽器點了沒反應）
         const a = el('a', 'btn btn-choice', '下載分享卡 PNG');
         a.href = URL.createObjectURL(blob);
-        a.download = '雲上之旅-稱號卡.png';
+        a.download = '地獄遊記親子版-稱號卡.png';
         box.insertBefore(a, hint);
       }
       if (!blob && navigator.share) {

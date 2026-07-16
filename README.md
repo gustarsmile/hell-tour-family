@@ -1,6 +1,6 @@
-# 雲上之旅：天堂遊記
+# 地獄遊記・親子共讀版
 
-依《天堂遊記》《地獄遊記》兩部善書改編的親子教育網頁遊戲（自 hell-tour-game 分支，故事框架改為「天堂—地府—天堂」）。此為完整一輪遊：
+依《地獄遊記》《天堂遊記》兩部善書改編的親子教育網頁遊戲（自 hell-tour-game 分支，故事框架「天堂—地府—天堂」）。此為完整一輪遊：
 入口封面（完整遊歷／精簡速覽）→ 序章「雲上茶會」（乘蓮台過南天門、雲鏡四問、原靈花樹）→ 蓮台下凡 → 十殿見習（四完整判案殿＋五見聞殿＋枉死城支線＋望鄉臺）→ 第十殿結算關（孟婆亭、悟性公布、孽鏡反照、花樹四結局、回天瑤池盛會）→ 善書冊與稱號分享卡。
 
 一輪時長：完整版實測估算 26–51 分鐘（`node scripts/estimate-length.mjs`）；精簡版走 `flow.json` 的 `modes.lite` 精選六站，約 12–20 分鐘。
@@ -24,7 +24,7 @@
 
 ## 部署（GitHub Pages）
 
-正式網址：`https://gustarsmile.github.io/heaven-tour-game/`（`js/config.js` 的 `GAME_URL`）。
+正式網址：`https://gustarsmile.github.io/hell-tour-family/`（`js/config.js` 的 `GAME_URL`）
 
 1. GitHub repo（帳號 `gustarsmile`）啟用 Settings → Pages，來源選根目錄（本專案無建置步驟，純靜態檔案直接發佈）。
 2. Push 到預設分支後，GitHub Pages 會自動部署上述網址。

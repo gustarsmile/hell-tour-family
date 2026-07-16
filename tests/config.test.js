@@ -3,7 +3,7 @@ import { GAME_TITLE, WU_CAP } from '../js/config.js';
 
 describe('config', () => {
   it('定義遊戲標題', () => {
-    expect(GAME_TITLE).toBe('雲上之旅：天堂遊記');
+    expect(GAME_TITLE).toBe('地獄遊記・親子共讀版');
   });
   it('悟性值上限為 100', () => {
     expect(WU_CAP).toBe(100);

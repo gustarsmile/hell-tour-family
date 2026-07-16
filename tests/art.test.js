@@ -4,6 +4,7 @@ import { existsSync, statSync, readdirSync } from 'node:fs';
 export const ART_MANIFEST = [
   'jigong-main', 'jigong-warm', 'jigong-stern',
   'prologue-heaven', 'interlude-descend',
+  'jigong-heaven', 'gate-nantianmen', 'yaochi-tea', 'tree-garden',
   'hall1-scene', 'hall2-scene', 'hall3-scene', 'hall4-scene', 'hall5-scene',
   'hall6-scene', 'hall7-scene', 'hall8-scene', 'hall9-scene', 'hall10-scene',
   'soul-hall1', 'soul-hall3', 'soul-hall5', 'soul-hall7',
@@ -17,8 +18,8 @@ export const ART_MANIFEST = [
 ].map((n) => `${n}.webp`);
 
 describe('美術資產', () => {
-  it('manifest 41 張齊備', () => {
-    expect(ART_MANIFEST.length).toBe(41);
+  it('manifest 45 張齊備', () => {
+    expect(ART_MANIFEST.length).toBe(45);
     for (const f of ART_MANIFEST) expect(existsSync(`assets/art/${f}`), f).toBe(true);
   });
   it('總體積在 6MB 預算內（手機掃碼即玩）', () => {

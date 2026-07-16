@@ -24,7 +24,7 @@
 
 ## 部署（GitHub Pages）
 
-正式網址：`https://gustarsmile.github.io/hell-tour-family/`（`js/config.js` 的 `GAME_URL`）
+正式網址：`https://gustarsmile.github.io/hell-tour-family/`（`js/config.js` 的 `GAME_URL`）。
 
 1. GitHub repo（帳號 `gustarsmile`）啟用 Settings → Pages，來源選根目錄（本專案無建置步驟，純靜態檔案直接發佈）。
 2. Push 到預設分支後，GitHub Pages 會自動部署上述網址。

@@ -2,8 +2,8 @@
 
 
 <iframe
-  src="https://gustarsmile.github.io/hell-tour-game/"
-  title="幽冥之旅：地獄遊記"
+  src="https://gustarsmile.github.io/hell-tour-family/"
+  title="地獄遊記・親子共讀版"
   style="width: 100%; max-width: 480px; height: 780px; border: 0; border-radius: 8px; display: block; margin: 0 auto;"
   allow="web-share"
   loading="lazy">
@@ -15,8 +15,8 @@ allow="web-share" 不能省 — 沒有它，嵌在別人網站裡時「分享結
 想要滿版占滿手機螢幕的話，用這個 RWD 包法：
 
 <div style="position: relative; width: 100%; height: 90vh; max-height: 900px;">
-  <iframe src="https://gustarsmile.github.io/hell-tour-game/"
-    title="幽冥之旅：地獄遊記"
+  <iframe src="https://gustarsmile.github.io/hell-tour-family/"
+    title="地獄遊記・親子共讀版"
     style="position: absolute; inset: 0; width: 100%; height: 100%; border: 0;"
     allow="web-share"></iframe>
 </div>
@@ -24,5 +24,5 @@ allow="web-share" 不能省 — 沒有它，嵌在別人網站裡時「分享結
 
 
 <p style="text-align: center;">
-  <a href="https://gustarsmile.github.io/hell-tour-game/" target="_blank" rel="noopener">⛩ 全螢幕開啟遊戲</a>
+  <a href="https://gustarsmile.github.io/hell-tour-family/" target="_blank" rel="noopener">⛩ 全螢幕開啟遊戲</a>
 </p>

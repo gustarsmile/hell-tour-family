@@ -27,6 +27,8 @@ function validateScene(scene) {
   expect(ids.size).toBe(scene.nodes.length);
   expect(ids.has(scene.start)).toBe(true);
   for (const node of scene.nodes) {
+    if (node.art) expectArt(node.art);
+    if (node.img) expectArt(node.img);
     if (node.type === 'line') expect(ids.has(node.next)).toBe(true);
     if (node.type === 'choice') {
       expect(node.choices.length).toBeGreaterThanOrEqual(2);

@@ -249,6 +249,31 @@ describe('全流程整合（flow manifest）', () => {
     [...root.querySelectorAll('button')].find((b) => b.textContent === '重新開始').click();
     expect([...loadBooklet(storage)].sort()).toEqual([...cardScreens].sort());
   });
+
+  it('序章節點級換景：art 節點起換左上圖並延續，返回同步回退', async () => {
+    const storage = fakeStorage();
+    const root = document.createElement('div');
+    let backFn = null;
+    const nav = { setBack: (f) => { backFn = f; }, setMenu() {}, closeMenu() {}, toast() {} };
+    await startGame({ root, loadJSON, storage, nav });
+    [...root.querySelectorAll('button')].find((b) => b.textContent.includes('完整遊歷')).click();
+    const artSrc = () => root.querySelector('.scene-art img').getAttribute('src');
+    // intro1：場景級預設圖
+    expect(artSrc()).toBe('assets/art/prologue-heaven.webp');
+    // intro2（濟公自介）：換濟公圖，且不再有內嵌立繪
+    root.querySelector('.btn-next').click();
+    expect(artSrc()).toBe('assets/art/jigong-heaven.webp');
+    expect(root.querySelector('.art-figure')).toBeNull();
+    // intro3～ascend2 無 art 欄位：延續濟公圖
+    for (let i = 0; i < 4; i++) root.querySelector('.btn-next').click();
+    expect(artSrc()).toBe('assets/art/jigong-heaven.webp');
+    // gate1：南天門
+    root.querySelector('.btn-next').click();
+    expect(artSrc()).toBe('assets/art/gate-nantianmen.webp');
+    // 返回一步（回 ascend2）：回退為濟公圖
+    backFn();
+    expect(artSrc()).toBe('assets/art/jigong-heaven.webp');
+  });
 });
 
 describe('枉死城支線功德', () => {

@@ -15,7 +15,7 @@
       "id": "intro2",
       "type": "line",
       "speaker": "濟公",
-      "img": "jigong-main.webp",
+      "art": "jigong-heaven.webp",
       "text": "「莫慌、莫慌！貧僧濟公是也。今夜奉旨，接你上天堂開開眼界。哈哈哈！」",
       "next": "intro3"
     },
@@ -50,6 +50,7 @@
     {
       "id": "gate1",
       "type": "line",
+      "art": "gate-nantianmen.webp",
       "speaker": "旁白",
       "text": "前方一座大門聳入雲霄，門前一個毛茸茸的身影，一根金棒舞得虎虎生風——那身手，像極了故事裡的孫悟空。",
       "next": "gate2"
@@ -78,6 +79,7 @@
     {
       "id": "yao1",
       "type": "line",
+      "art": "yaochi-tea.webp",
       "speaker": "旁白",
       "text": "過了南天門，眼前豁然開朗——瑤池到了。白玉亭台浮在雲海上，仙鶴掠過，亭裡幾位神仙正圍坐喝茶。",
       "next": "yao2"
@@ -273,6 +275,7 @@
     {
       "id": "tree3",
       "type": "line",
+      "art": "tree-garden.webp",
       "speaker": "旁白",
       "text": "濟公領你到瑤池後的花園。好大的一座園子！種滿了各式各樣的樹：有的開滿花、結滿果；有的葉子斑斑、枝幹歪歪。",
       "next": "tree4"

@@ -33,8 +33,8 @@
 | `js/ui/nav.js` | 改 | 選單 `open()`／`close()` 改走 layer handle |
 | `js/flow.js` | 改 | `openBookletOverlay()` 改走 layer handle |
 | `css/style.css` | 改 | 附加大圖疊層樣式 |
-| `tests/layer.test.js` | 新增 | layer.js 的 9 個關閉語意案例（單元） |
-| `tests/lightbox.test.js` | 新增 | 大圖疊層 11 案例 |
+| `tests/layer.test.js` | 新增 | layer.js 的 12 個關閉語意案例（單元） |
+| `tests/lightbox.test.js` | 新增 | 大圖疊層 12 案例 |
 | `tests/overlays.test.js` | 新增 | 漢堡選單 4 案例＋善書冊 5 案例（整合）。**獨立成檔**：這些測試會清掉 body 內的疊層節點，與 lightbox 單例共處一檔會造成跨測試污染 |
 
 ---
@@ -77,8 +77,13 @@ beforeEach(() => {
   vi.spyOn(window.history, 'pushState');
 });
 
-afterEach(() => {
+// 必須是 async 且 await flush()：測試中 close() 觸發的 mock back() 會排入 setTimeout，
+// 同步的 afterEach 不會讓它有機會執行，殘留計時器會累積到後面某個 await 一次湧入，
+// 在錯誤的時機送出 popstate。先 resetLayers() 再 flush，
+// 讓殘留 popstate 落在「堆疊已空、監聽已解除」的 no-op 分支。
+afterEach(async () => {
   resetLayers();
+  await flush();
   vi.restoreAllMocks();
 });
 
@@ -118,43 +123,119 @@ describe('layer.js', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('開關一輪歷程成對：pushState 與 back 各一次', () => {
+  it('開關一輪歷程成對：pushState 與 back 各一次', async () => {
     pushLayer(() => {}).close();
+    await flush(); // 對帳在 microtask，back() 不是同步發生
     expect(window.history.pushState).toHaveBeenCalledTimes(1);
     expect(backSpy).toHaveBeenCalledTimes(1);
   });
 
   it('堆疊為空時 Esc 與 popstate 皆為 no-op', () => {
+    // 必須先 pushLayer 讓監聽器實際掛上，再把堆疊清空。
+    // 若直接在未綁定狀態下 dispatch，事件沒人聽，not.toThrow() 會是恆真斷言，
+    // 連 onKeydown／onPopstate 的空堆疊 guard 整段刪掉都測不出來。
+    const onClose = vi.fn();
+    pushLayer(onClose);
+    fireBack(); // 以 popstate 關掉它——此路徑不呼叫 back()，不會有回音
+    expect(layerDepth()).toBe(0);
+    onClose.mockClear();
+
     expect(() => { esc(); fireBack(); }).not.toThrow();
+    expect(onClose).not.toHaveBeenCalled();
     expect(layerDepth()).toBe(0);
   });
 
-  it('pushState 拋錯（file:// 情境）時仍可關閉且不呼叫 back', () => {
+  it('pushState 拋錯（file:// 情境）時仍可關閉且不呼叫 back', async () => {
     window.history.pushState.mockImplementation(() => { throw new Error('SecurityError'); });
     const onClose = vi.fn();
     pushLayer(onClose).close();
+    await flush();
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(backSpy).not.toHaveBeenCalled();
   });
 
   it('多次開關不重複綁定監聽器', () => {
+    // 直接數 addEventListener 的呼叫次數。只用「onClose 被叫幾次」測不出重複綁定：
+    // 第一個 handler 的 dismiss 會把該層移出堆疊，第二個 handler 見到空堆疊即 return，
+    // 正確與重複綁定兩種情形的結果無法區分。
+    const docSpy = vi.spyOn(document, 'addEventListener');
+    const winSpy = vi.spyOn(window, 'addEventListener');
     pushLayer(() => {}).close();
     pushLayer(() => {}).close();
+    pushLayer(() => {}).close();
+    expect(docSpy.mock.calls.filter(([type]) => type === 'keydown')).toHaveLength(1);
+    expect(winSpy.mock.calls.filter(([type]) => type === 'popstate')).toHaveLength(1);
+
     const onClose = vi.fn();
     pushLayer(onClose);
     esc();
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('關閉一層後同步開啟另一層，前者的 back 回音不得關閉後者', async () => {
+  // 這是全套最關鍵的測試：它守的正是真實瀏覽器上會把使用者踢出遊戲的那個缺陷。
+  // 舊設計在此情境會 back() 一次又 pushState 一次，兩者在途交錯使歷程位置與帳目失步；
+  // 新設計在對帳時看到堆疊非空，根本不呼叫 back()，全程只持有最初那一筆紀錄。
+  it('關閉一層後同步開啟另一層：不得呼叫 back，且沿用同一筆歷程', async () => {
     const first = vi.fn();
     const second = vi.fn();
-    pushLayer(first).close();   // 觸發 back()，popstate 稍後才到
-    pushLayer(second);          // 立刻開下一層（menuAction 的 close(); fn(); 情境）
+    pushLayer(first).close();   // menuAction 的 close(); fn(); 情境
+    pushLayer(second);          // 同一輪內立刻開下一層
     await flush();
     await flush();
     expect(first).toHaveBeenCalledTimes(1);
     expect(second).not.toHaveBeenCalled();
+    expect(layerDepth()).toBe(1);
+    expect(backSpy).not.toHaveBeenCalled();                    // 關鍵：完全沒有 back()
+    expect(window.history.pushState).toHaveBeenCalledTimes(1); // 關鍵：只推了一筆
+  });
+
+  it('巢狀時返回鍵逐層關閉：關掉頂層後為下層補推歷程', () => {
+    const outer = vi.fn();
+    const inner = vi.fn();
+    pushLayer(outer);
+    pushLayer(inner);
+    expect(window.history.pushState).toHaveBeenCalledTimes(1); // 兩層只持有一筆
+    fireBack();
+    expect(inner).toHaveBeenCalledTimes(1);
+    expect(outer).not.toHaveBeenCalled();
+    expect(layerDepth()).toBe(1);
+    expect(window.history.pushState).toHaveBeenCalledTimes(2); // 為下層補推
+    fireBack();
+    expect(outer).toHaveBeenCalledTimes(1);
+    expect(layerDepth()).toBe(0);
+    expect(window.history.pushState).toHaveBeenCalledTimes(2); // 堆疊已空，不得再補推孤兒紀錄
+  });
+
+  // 帳目守恆：走完「開 A → 同輪關 A 開 B → 關 B」後，pushState 與 back 次數必須相等，
+  // 且系統要回到乾淨狀態（held／consuming 都已重置）——以「再開一層會讓 pushState +1」證明。
+  // 這條同時守住 onPopstate 的 held = false 與 consuming = false 兩行；
+  // 少了它，那兩行被刪掉都不會有任何測試變紅。
+  it('帳目守恆：一輪互動後 pushState 與 back 次數相等且狀態歸零', async () => {
+    const a = pushLayer(() => {});
+    a.close();
+    const b = pushLayer(() => {});
+    b.close();
+    await flush();
+    await flush();
+    expect(window.history.pushState).toHaveBeenCalledTimes(1);
+    expect(backSpy).toHaveBeenCalledTimes(1);
+    expect(layerDepth()).toBe(0);
+
+    pushLayer(() => {}); // 狀態已歸零的證明：能再推一筆
+    expect(window.history.pushState).toHaveBeenCalledTimes(2);
+  });
+
+  it('back 回音在途期間開新層，回音抵達時補推歷程', async () => {
+    pushLayer(() => {}).close();
+    await Promise.resolve(); // 讓對帳的 microtask 跑完，此時 back() 已呼叫、popstate 尚未到
+    const second = vi.fn();
+    pushLayer(second);
+    // 守住 pushLayer 的 !consuming 條件——那是「不在 back() 在途時 pushState」的唯一防線，
+    // 也就是造成 about:blank 的交錯本身。少了這行斷言，拿掉 !consuming 測試照樣全綠。
+    expect(window.history.pushState).toHaveBeenCalledTimes(1); // 回音在途期間不得推
+    await flush();
+    expect(second).not.toHaveBeenCalled();                     // 回音不得關掉新層
+    expect(window.history.pushState).toHaveBeenCalledTimes(2); // 補推了一筆給新層用
     expect(layerDepth()).toBe(1);
   });
 });
@@ -170,8 +251,16 @@ Expected: FAIL，`Failed to resolve import "../js/ui/layer.js"`
 ```js
 // 疊層關閉的共用管理：Esc 與系統返回鍵，後開先關（LIFO）。
 // 本模組只管「何時該關」，不碰任何疊層的 DOM——各疊層以 onClose 回呼自理。
+//
+// 歷程策略：只要堆疊非空就「恰好」持有一筆 history 紀錄，不是每層各推一筆。
+// 原因（2026-07-28 真實瀏覽器實測）：nav.js 的 menuAction 是 close(); fn(); 同步連續執行，
+// 若關閉時立刻 back()、緊接著 fn() 又 pushState，兩者會在途中交錯——瀏覽器的 back()
+// 解析為「回到呼叫當下那一筆」的絕對位置而非相對退一步，導致歷程位置比內部帳目少一格，
+// 下一次關閉再 back() 就多退一步，整個離開遊戲跳到 about:blank。
+// 改以 microtask 對帳後，同一輪內關舊層又開新層時根本不會呼叫 back()，交錯不復存在。
 const stack = [];
-let pendingBacks = 0; // 我方呼叫 history.back() 的筆數，用來辨識 popstate 來源
+let held = false;      // 目前是否持有那筆歷程紀錄
+let consuming = false; // 已呼叫 back()，正在等自己的 popstate 回音
 let boundDoc = null;
 
 function dismiss(layer) {
@@ -188,14 +277,43 @@ function onKeydown(e) {
   stack[stack.length - 1].close();
 }
 
-// popstate 有兩種來源：使用者按返回鍵，或我方 close() 呼叫 back() 的回音。
-// 後者必須忽略——否則「關選單、同一輪立刻開善書冊」會把善書冊關掉。
+function pushEntry(win) {
+  try {
+    win.history.pushState({ layer: true }, '');
+    held = true;
+  } catch {
+    held = false; // file:// 直開時 pushState 會丟 SecurityError，降級為僅點擊／Esc 可關
+  }
+}
+
+// popstate 有兩種來源：使用者按返回鍵，或我方 back() 的回音。
 function onPopstate() {
-  if (pendingBacks > 0) {
-    pendingBacks -= 1;
+  const win = boundDoc.defaultView;
+  if (consuming) {
+    consuming = false;
+    // 回音在途期間若又開了新層，補推一筆，讓返回鍵仍能關閉它
+    if (stack.length && !held) pushEntry(win);
     return;
   }
-  if (stack.length) dismiss(stack[stack.length - 1]);
+  held = false; // 瀏覽器已替我們退掉那筆
+  if (!stack.length) return;
+  dismiss(stack[stack.length - 1]);
+  // 若下層仍開著，補推一筆讓返回鍵也能逐層關掉。本 app 目前無巢狀，
+  // 但 artImg() 會自動為圖片掛上大圖疊層，日後只要有人在選單或善書冊裡放一張圖
+  // 就會出現巢狀；少了這行，第二次按返回鍵會直接退出遊戲。
+  // !held 與上面 consuming 分支對稱：若某層的 onClose 同步開了新層，該層已自行推過一筆，
+  // 這裡再推就會讓同一個非空堆疊持有兩筆，返回鍵得按兩次。
+  if (stack.length && !held) pushEntry(win);
+}
+
+// 對帳延到 microtask 執行：close(); fn(); 這種同一輪內關舊層又開新層的路徑，
+// 對帳時堆疊已非空，就保留原本那筆歷程、不呼叫 back()
+function reconcile(win) {
+  if (stack.length) return;
+  if (!held) return;
+  held = false;
+  consuming = true;
+  win.history.back();
 }
 
 function unbind() {
@@ -215,20 +333,15 @@ function ensureBound(doc) {
 
 export function pushLayer(onClose, doc = document) {
   ensureBound(doc);
-  const layer = { onClose, pushed: false };
+  const win = doc.defaultView;
+  const layer = { onClose };
   layer.close = () => {
-    if (!dismiss(layer)) return; // 已關閉則不重複消耗歷程
-    if (!layer.pushed) return;
-    pendingBacks += 1;
-    doc.defaultView.history.back();
+    if (!dismiss(layer)) return; // 已關閉則不重複對帳
+    Promise.resolve().then(() => reconcile(win));
   };
-  try {
-    doc.defaultView.history.pushState({ layer: true }, '');
-    layer.pushed = true;
-  } catch {
-    layer.pushed = false; // file:// 直開時 pushState 會丟 SecurityError，降級為僅點擊／Esc 可關
-  }
   stack.push(layer);
+  // 已持有紀錄、或正在等回音，都不重複推——回音抵達時 onPopstate 會補推
+  if (!held && !consuming) pushEntry(win);
   return layer;
 }
 
@@ -239,7 +352,8 @@ export function layerDepth() {
 
 export function resetLayers() {
   stack.length = 0;
-  pendingBacks = 0;
+  held = false;
+  consuming = false;
   unbind();
 }
 ```
@@ -247,12 +361,12 @@ export function resetLayers() {
 - [ ] **Step 4: 執行測試確認通過**
 
 Run: `npm test -- tests/layer.test.js`
-Expected: PASS，9 passed
+Expected: PASS，12 passed
 
 - [ ] **Step 5: 執行全套測試確認無回歸**
 
 Run: `npm test`
-Expected: 171 passed（162 + 9）
+Expected: 174 passed（162 + 12）
 
 - [ ] **Step 6: Commit**
 
@@ -287,10 +401,10 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```js
 // @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { enableLightbox } from '../js/ui/lightbox.js';
+import { enableLightbox, openLightbox } from '../js/ui/lightbox.js';
 import { artImg } from '../js/ui/render.js';
 import { renderCover } from '../js/ui/coverView.js';
-import { resetLayers } from '../js/ui/layer.js';
+import { resetLayers, layerDepth } from '../js/ui/layer.js';
 
 const flush = () => new Promise((r) => setTimeout(r, 0));
 
@@ -301,8 +415,13 @@ beforeEach(() => {
   });
 });
 
+// 必須走「真正的關閉路徑」而不是只拿掉 open class：lightbox.js 的模組級 layer
+// 要靠 onClose 才會歸零，而 resetLayers() 只清 layer.js 自己的堆疊。若讓某個測試
+// 帶著開啟狀態結束（例如「關閉後再開」那個案例），殘留的死 handle 會讓
+// openLightbox 的 if (layer) return 短路掉後續所有案例。
 afterEach(async () => {
-  document.querySelector('#lightbox')?.classList.remove('open');
+  const box = document.querySelector('#lightbox');
+  if (box?.classList.contains('open')) box.click();
   resetLayers();
   await flush();
   vi.restoreAllMocks();
@@ -324,6 +443,18 @@ describe('lightbox.js', () => {
     img.click();
     expect(isOpen()).toBe(true);
     expect(lb().querySelector('.lightbox-img').src).toBe(img.src);
+  });
+
+  it('已開啟時再次開啟只換圖，不重複推疊層', () => {
+    document.body.style.overflow = 'scroll';
+    artImg('hall1-scene.webp').click();
+    const second = artImg('hall2-scene.webp');
+    openLightbox(second.src);
+    expect(layerDepth()).toBe(1); // 沒有殘層
+    expect(lb().querySelector('.lightbox-img').src).toBe(second.src);
+    lb().click();
+    expect(document.body.style.overflow).toBe('scroll'); // 原始值未被 'hidden' 覆蓋
+    document.body.style.overflow = '';
   });
 
   it('點疊層背景可關閉', () => {
@@ -416,7 +547,6 @@ import { pushLayer } from './layer.js';
 let overlay = null;
 let bigImg = null;
 let layer = null;
-let prevOverflow = '';
 
 function ensureOverlay(doc) {
   if (overlay) return;
@@ -449,8 +579,12 @@ function ensureOverlay(doc) {
 export function openLightbox(src, doc = document) {
   ensureOverlay(doc);
   bigImg.src = src;
+  // 已開啟時只換圖：重複推疊層會讓原始捲動狀態被 'hidden' 覆蓋而永久遺失，
+  // 且會在 layer.js 堆疊裡留下無人消耗的殘層，破壞單層不變式
+  if (layer) return;
   overlay.classList.add('open');
-  prevOverflow = doc.body.style.overflow;
+  // 以區域變數捕獲，讓 closure 持有屬於這一次開啟的值，不受後續開啟影響
+  const prevOverflow = doc.body.style.overflow;
   doc.body.style.overflow = 'hidden';
   layer = pushLayer(() => {
     overlay.classList.remove('open');
@@ -561,12 +695,12 @@ img.zoomable { cursor: zoom-in; }
 - [ ] **Step 7: 執行測試確認通過**
 
 Run: `npm test -- tests/lightbox.test.js`
-Expected: PASS，11 passed
+Expected: PASS，12 passed
 
 - [ ] **Step 8: 執行全套測試確認無回歸**
 
 Run: `npm test`
-Expected: 182 passed（171 + 11）。特別確認 `tests/ui.test.js` 與 `tests/html.test.js` 仍全過。
+Expected: 186 passed（174 + 12）。特別確認 `tests/ui.test.js` 與 `tests/html.test.js` 仍全過。
 
 - [ ] **Step 9: Commit**
 
@@ -722,7 +856,7 @@ describe('善書冊接入 layer', () => {
     expect(bookletOpen()).toBe(false);
   });
 
-  it('經選單開啟善書冊後仍在畫面上（pendingBacks 端到端）', async () => {
+  it('經選單開啟善書冊後仍在畫面上（歷程對帳端到端）', async () => {
     const cfg = await bootFlow();
     // 重現 nav.js 的 menuAction：close(); fn(); ——關選單與開善書冊在同一輪同步發生
     mountNav({ onBooklet: cfg.onBooklet });
@@ -732,7 +866,7 @@ describe('善書冊接入 layer', () => {
     expect(bookletOpen()).toBe(true);
     await flush();
     await flush();
-    expect(bookletOpen()).toBe(true); // 關選單那次 back() 的回音不得關掉善書冊
+    expect(bookletOpen()).toBe(true); // 關選單那一輪不得觸發 back()，善書冊必須留在畫面上
   });
 
   it('單層不變式：堆疊深度不超過 1', async () => {
@@ -803,7 +937,7 @@ Expected: PASS，9 passed（4 選單 + 5 善書冊）
 - [ ] **Step 6: 執行全套測試確認無回歸**
 
 Run: `npm test`
-Expected: 191 passed（182 + 9），18 個測試檔。特別確認 `tests/flow.test.js` 全過。
+Expected: 195 passed（186 + 9），18 個測試檔。特別確認 `tests/flow.test.js` 全過。
 
 - [ ] **Step 7: Commit**
 
@@ -928,7 +1062,7 @@ import { pushLayer } from './ui/layer.js';
 - [ ] **Step 6: 執行全套測試**
 
 Run: `npm test`
-Expected: 196 passed（167 + 9 + 11 + 9），18 個測試檔
+Expected: 200 passed（167 + 12 + 12 + 9），18 個測試檔
 
 **family 專屬風險**：`js/ui/coverView.js` 的封面標題文字若被 Step 1 誤複製覆蓋，`tests/html.test.js` 或既有封面測試會失敗。若出現此類失敗，先 `git diff js/ui/coverView.js` 確認三行文字是否被改成 game 版。
 
